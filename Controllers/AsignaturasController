@@ -1,0 +1,98 @@
+var conexionBD = require('../Conexion/ConexionBD');
+const sql = require('mssql');
+//const productos = require('../Modelos/Productos');
+const Asignaciones = require('../Modelos/Asignaciones');
+
+//Funciones
+
+async function obtenerTodos()
+{
+    try
+    {
+        let conn = await sql.connect(conexionBD);
+        let asignaturas = await conn.request()
+                        .input('operacion', sql.Char, 'T')
+                        .execute('spAsignaturas');                        
+        return asignaturas.recordset;                        
+    }
+    catch (error)
+    {
+        console.log(error);
+    }
+}
+
+async function obtenerxId(id)
+{
+    try
+    {
+        let conn = await sql.connect(conexionBD);
+        let asignatura = await conn.request()
+            .input('id', id)
+            .input('operacion', sql.Char, 'B')
+            .execute('spAsignaturas')
+        return asignatura.recordset;
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+}
+
+async function guardarAsignatura (Asignatura)
+{
+    try
+    {
+        let cnn = await sql.connect(conexionBD);
+        let asignatura = await cnn.request()
+            .input('codigo', sql.NVarChar, Asignatura.Codigo)
+            .input('nombre', sql.NVarChar, Asignatura.Nombre)
+            .input('creditos', sql.Int, Asignatura.Creditos)            
+            .input('operacion', sql.Char, 'G')
+            .execute('spAsignaturas');
+        return asignatura.recordset;
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+}
+
+async function actualizarAsignatura (Asignatura)
+{
+    try
+    {
+        let cnn = await sql.connect(conexionBD);
+        let asignatura = await cnn.request()
+            .input('id', sql.Int, Asignatura.Id)
+            .input('codigo', sql.NVarChar, Asignatura.Codigo)
+            .input('nombre', sql.NVarChar, Asignatura.Nombre)
+            .input('creditos', sql.Int, Asignatura.Creditos)            
+            .input('operacion', sql.Char, 'A')
+            .execute('spAsignaturas');
+        return asignatura.recordset;
+    }
+    catch (error)
+    {
+        console.log(error);
+    }
+}
+
+async function eliminarAsignatura (id)
+{
+    try
+    {        
+        let cnn = await sql.connect(conexionBD);
+        let asignatura = await cnn.request()
+            .input('id', sql.Int, id)     
+            .input('operacion', sql.Char, 'E')
+            .execute('spAsignaturas');
+        return asignatura.recordset;
+    }
+    catch (error)
+    {
+        console.log(error);
+    }
+}
+
+module.exports = { obtenerTodos:obtenerTodos, obtenerxId:obtenerxId, guardarAsignatura:guardarAsignatura,
+    actualizarAsignatura:actualizarAsignatura, eliminarAsignatura:eliminarAsignatura };
